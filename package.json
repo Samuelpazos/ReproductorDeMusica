@@ -1,0 +1,15 @@
+{
+  "name": "doubleplay",
+  "version": "1.0.0",
+  "description": "Reproductor de música con Lista Doblemente Enlazada — Taller de Estructuras de Datos",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "vite": "^5.1.4"
+  }
+}

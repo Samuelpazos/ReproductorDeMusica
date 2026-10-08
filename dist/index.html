@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="DOUBLEPLAY — Reproductor de música moderno implementado con Lista Doblemente Enlazada. Sube tus canciones y escúchalas." />
+    <title>DOUBLEPLAY — Reproductor con Lista Doble</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script type="module" crossorigin src="/assets/index-B-iI9flU.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-D9YyYQqA.css">
+  </head>
+  <body>
+    
+    <header class="app-header" role="banner">
+      <div class="header-left">
+        <div class="logo">
+          <div class="logo-icon">
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="20" cy="20" r="20" fill="url(#logoGrad)"/>
+              <path d="M14 12v16l14-8-14-8z" fill="white"/>
+              <defs>
+                <linearGradient id="logoGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#8b5cf6"/>
+                  <stop offset="1" stop-color="#a78bfa"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="logo-text">
+            <span class="logo-title">DOUBLEPLAY</span>
+            <span class="logo-subtitle">Lista Doblemente Enlazada</span>
+          </div>
+        </div>
+      </div>
+      <div class="header-center">
+        <div class="search-container">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input type="text" id="searchInput" placeholder="Buscar canción, artista o álbum..." aria-label="Buscar en la playlist" class="search-input" />
+          <button id="clearSearch" class="search-clear" aria-label="Limpiar búsqueda" style="display:none">✕</button>
+        </div>
+      </div>
+      <div class="header-right">
+        <button id="devModeBtn" class="btn-header" aria-label="Modo desarrollador">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+          </svg>
+          <span>Dev</span>
+        </button>
+        <button id="infoBtn" class="btn-header" aria-label="Información">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          <span>Info</span>
+        </button>
+      </div>
+    </header>
+
+    
+    <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+    
+    <main class="app-main" role="main">
+      
+      <aside class="panel-playlist" aria-label="Lista de reproducción">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+              <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+            </svg>
+            Mi Playlist
+          </h2>
+          <div class="stats-badges" id="statsDisplay">
+            <span class="badge" id="songCountBadge">0 canciones</span>
+            <span class="badge badge-time" id="totalDurationBadge">0:00</span>
+          </div>
+        </div>
+        <div class="playlist-controls">
+          <button id="clearPlaylistBtn" class="btn-danger-sm" aria-label="Vaciar playlist">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
+              <path d="M10 11v6"/><path d="M14 11v6"/>
+            </svg>
+            Vaciar
+          </button>
+        </div>
+        <div class="playlist-container" id="playlistContainer" role="list" aria-label="Canciones en la playlist">
+          <div class="playlist-empty" id="playlistEmpty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+            </svg>
+            <p>Tu playlist está vacía</p>
+            <span>Sube canciones usando el panel derecho</span>
+          </div>
+        </div>
+
+        
+        <div class="stats-panel">
+          <h3 class="stats-title">Estado de la Lista</h3>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-label">Cabeza</span>
+              <span class="stat-value" id="statHead">—</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Actual</span>
+              <span class="stat-value" id="statCurrent">—</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Cola</span>
+              <span class="stat-value" id="statTail">—</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Tamaño</span>
+              <span class="stat-value" id="statSize">0</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      
+      <section class="panel-player" aria-label="Reproductor de música">
+        
+        <div class="now-playing">
+          <div class="album-art-container">
+            <div class="album-art" id="albumArt">
+              <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="50" cy="50" r="50" fill="url(#albumDefaultGrad)"/>
+                <path d="M38 35v30l26-15-26-15z" fill="white" opacity="0.7"/>
+                <defs>
+                  <linearGradient id="albumDefaultGrad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#c4b5fd"/>
+                    <stop offset="1" stop-color="#8b5cf6"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <div class="album-vinyl" id="albumVinyl" aria-hidden="true"></div>
+          </div>
+
+          <div class="track-info">
+            <div class="track-position" id="trackPosition">
+              <span class="playing-indicator" id="playingIndicator" aria-hidden="true">
+                <span></span><span></span><span></span><span></span>
+              </span>
+              <span id="trackPositionText">Sin canción</span>
+            </div>
+            <h1 class="track-title" id="trackTitle">DOUBLEPLAY</h1>
+            <p class="track-artist" id="trackArtist">Selecciona una canción para reproducir</p>
+            <p class="track-album" id="trackAlbum">—</p>
+          </div>
+        </div>
+
+        
+        <div class="progress-section">
+          <span class="time-current" id="timeCurrentDisplay">0:00</span>
+          <div class="progress-bar-container" role="slider" aria-label="Progreso de la canción" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBarContainer">
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="progressBar"></div>
+              <div class="progress-thumb" id="progressThumb"></div>
+            </div>
+          </div>
+          <span class="time-total" id="timeTotalDisplay">0:00</span>
+        </div>
+
+        
+        <div class="player-controls">
+          <button class="ctrl-btn ctrl-sm" id="shuffleBtn" aria-label="Modo aleatorio" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/>
+              <polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/>
+            </svg>
+          </button>
+          <button class="ctrl-btn ctrl-md" id="prevBtn" aria-label="Canción anterior">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </button>
+          <button class="ctrl-btn ctrl-lg ctrl-play" id="playPauseBtn" aria-label="Reproducir">
+            <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="display:none">
+              <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
+            </svg>
+          </button>
+          <button class="ctrl-btn ctrl-md" id="nextBtn" aria-label="Siguiente canción">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </button>
+          <button class="ctrl-btn ctrl-sm" id="repeatBtn" aria-label="Modo repetir" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+              <polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+            </svg>
+            <span class="repeat-badge" id="repeatBadge" style="display:none">1</span>
+          </button>
+        </div>
+
+        
+        <div class="volume-section">
+          <button class="vol-btn" id="muteBtn" aria-label="Silenciar">
+            <svg id="volIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            </svg>
+          </button>
+          <div class="volume-slider-container">
+            <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="80" aria-label="Volumen" />
+          </div>
+          <span class="vol-value" id="volValue">80%</span>
+        </div>
+      </section>
+
+      
+      <aside class="panel-add" aria-label="Agregar canción">
+        <div class="panel-header">
+          <h2 class="panel-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            Subir Canciones
+          </h2>
+        </div>
+
+        
+        <div class="upload-section">
+          
+          <input
+            type="file"
+            id="audioFileInput"
+            accept=".mp3,.ogg,.wav,.flac,.m4a,.aac,.opus,.webm,audio/*"
+            multiple
+            style="display:none"
+            aria-label="Seleccionar archivos de audio"
+          />
+
+          
+          <div class="drop-zone" id="audioDropZone" role="button" tabindex="0" aria-label="Zona de carga de audio">
+            <span class="drop-icon">🎵</span>
+            <span class="drop-label">Sube tu canción</span>
+            <span class="drop-sub">Arrastra un archivo o haz clic aquí • MP3, WAV, OGG, FLAC</span>
+            <span class="drop-multi-hint">Puedes seleccionar varios archivos a la vez</span>
+          </div>
+        </div>
+
+        <div class="quick-remove-section">
+          <h3 class="section-subtitle">Eliminar canción</h3>
+          <div class="quick-remove-btns">
+            <button id="removeFirstBtn" class="btn-remove" aria-label="Eliminar primera canción">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
+              </svg>
+              Eliminar Inicio
+            </button>
+            <button id="removeLastBtn" class="btn-remove" aria-label="Eliminar última canción">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
+              </svg>
+              Eliminar Final
+            </button>
+          </div>
+          <div class="quick-remove-pos">
+            <input type="number" id="removePositionInput" class="form-input" placeholder="Posición a eliminar" min="1" aria-label="Posición a eliminar"/>
+            <button id="removeAtPositionBtn" class="btn-remove" aria-label="Eliminar canción en posición">Eliminar en posición</button>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    
+    <section class="panel-structure" aria-label="Visualización de la estructura de datos">
+      <div class="structure-header">
+        <h2 class="panel-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+          Estructura de Datos — Lista Doblemente Enlazada
+        </h2>
+        <div class="structure-legend">
+          <span class="legend-item legend-head">CABEZA</span>
+          <span class="legend-item legend-current">ACTUAL</span>
+          <span class="legend-item legend-tail">COLA</span>
+        </div>
+      </div>
+      <div class="structure-visualization" id="structureVisualization" role="img" aria-label="Visualización de la lista doblemente enlazada">
+        <div class="structure-empty">
+          <p>La lista está vacía. Agrega canciones para visualizar la estructura.</p>
+        </div>
+      </div>
+    </section>
+
+    
+    <div class="dev-panel" id="devPanel" aria-label="Panel de desarrollador" style="display:none">
+      <div class="dev-panel-header">
+        <h3>🖥 Modo Desarrollador — Debug de Lista Doble</h3>
+        <button id="closeDevPanel" class="close-btn" aria-label="Cerrar panel">✕</button>
+      </div>
+      <div class="dev-content" id="devContent"></div>
+    </div>
+
+    
+    <div class="modal-overlay" id="infoModal" role="dialog" aria-modal="true" aria-labelledby="infoModalTitle" style="display:none">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="infoModalTitle">¿Cómo funciona DOUBLEPLAY?</h2>
+          <button class="close-btn" id="closeInfoModal" aria-label="Cerrar información">✕</button>
+        </div>
+        <div class="modal-body">
+          <section class="info-section">
+            <h3>🎵 Reproducción de Música Real</h3>
+            <p>Sube tus propias canciones desde el dispositivo. El reproductor usa la <strong>Web Audio API</strong> del navegador para reproducir archivos MP3, WAV, OGG, FLAC y más. La duración se detecta automáticamente del archivo.</p>
+          </section>
+          <section class="info-section">
+            <h3>🔗 ¿Qué es una Lista Doblemente Enlazada?</h3>
+            <p>Una lista doblemente enlazada es una estructura de datos donde cada <strong>nodo</strong> contiene información y referencias bidireccionales: al nodo <em>anterior</em> y al nodo <em>siguiente</em>.</p>
+            <div class="node-diagram" aria-label="Diagrama de nodo">
+              <div class="node-diag-item">NULL</div>
+              <div class="node-diag-arrow">←</div>
+              <div class="node-diag-node">
+                <div class="node-diag-prev">← anterior</div>
+                <div class="node-diag-data">DATOS</div>
+                <div class="node-diag-next">siguiente →</div>
+              </div>
+              <div class="node-diag-arrow">→</div>
+              <div class="node-diag-item">NULL</div>
+            </div>
+          </section>
+          <section class="info-section">
+            <h3>✅ Ventajas sobre un Array</h3>
+            <ul class="info-list">
+              <li><strong>Navegación bidireccional:</strong> se puede avanzar y retroceder usando punteros.</li>
+              <li><strong>Inserción eficiente:</strong> agregar al inicio, final o posición sin desplazar elementos.</li>
+              <li><strong>Eliminación eficiente:</strong> eliminar un nodo solo requiere actualizar dos punteros.</li>
+              <li><strong>Sin tamaño fijo:</strong> crece dinámicamente según sea necesario.</li>
+            </ul>
+          </section>
+          <section class="info-section">
+            <h3>🎵 Cómo se usa en DOUBLEPLAY</h3>
+            <ul class="info-list">
+              <li><strong>Siguiente →</strong> ejecuta <code>current = current.next</code></li>
+              <li><strong>← Anterior</strong> ejecuta <code>current = current.previous</code></li>
+              <li><strong>Agregar al inicio</strong> crea un nuevo nodo como cabeza</li>
+              <li><strong>Agregar al final</strong> crea un nuevo nodo como cola</li>
+              <li><strong>Eliminar</strong> reconnecta los punteros del nodo anterior y siguiente</li>
+            </ul>
+          </section>
+          <section class="info-section">
+            <h3>📐 Estructura de SongNode</h3>
+            <pre class="code-block">class SongNode {
+  id: string
+  title: string
+  artist: string
+  album: string
+  duration: string
+  image: string
+  audioUrl: string
+  previous: SongNode | null
+  next: SongNode | null
+}</pre>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modalBackdrop" style="display:none"></div>
+
+  </body>
+</html>
