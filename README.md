@@ -18,6 +18,18 @@ npm install
 npm run dev
 ```
 
+## Despliegue en Vercel
+
+Importa el repositorio en Vercel y usa estos valores de compilación:
+
+| Opción | Valor |
+|---|---|
+| Framework Preset | Vite |
+| Build Command | `npm run build` |
+| Output Directory | `dist` |
+
+Estos valores también están definidos en `vercel.json`. La regla de reescritura permite que las rutas de la aplicación carguen correctamente al abrirlas directamente.
+
 ## Estructura del proyecto
 
 ```text
